@@ -1,7 +1,8 @@
 Проекты с домашней и другими работами когда я изучал php.
 
 # Content
-- [Progects - Проекты](https://github.com/SanyaDr/php-learning/tree/main#projects)
+- [Проекты](projects)
+- [Технологии](technologies)
 
 # Projects
 1. ***-UNRELEASED-** Session storage* - использование сессий для сохранения данных
@@ -14,6 +15,9 @@
    - Панель админа сайта
    - Блок комментариев и туров
 
+# Technologies
+- PHP, сервер Apache
+- БД mySql
 
 
 *Developer: Drovosekov Alexander*
