@@ -1,8 +1,21 @@
 <?
 // session_start();
 
+function connect(
+    $host = "localhost",
+    $user = "root",
+    $password = "SashaDr2006RusMyAdmin",
+    $dbname = "first_site"
+) {
+    $link = new mysqli($host, $user, $password, $dbname);
+    if ($link->connect_error) {
+        die("Ошибка: " . $link->connect_error);
+    }
+    return $link;
+}
+
 //файл для хранения пользователей
-$users = "pages/users.txt";
+// $users = "pages/users.txt";
 function register($name, $email, $pass)
 {
     //trim обрезаеt лишние символы(пробелыь переносы строк, табуляции)
@@ -33,27 +46,12 @@ function register($name, $email, $pass)
         return false;
     }
 
-    //получаем глобальную переменную
-    global $users;
+    $hash_password = md5($pass);
 
-    //открываем файл users.txt
-    $file = fopen($users, "a+");
-    //считываем построчно содержимое файла, по 128 символов
-    while ($line = fgets($file, 128)) {
-        //из строки извлекаем подстроку, которая содержит логин, до знака :
-        $readname = substr($line, 0, strpos($line, ":"));
-        //если такой логин уже есть в файле
-        if ($readname == $name) {
-            echo "<h3 class='text-danger'>Данное имя пользователя уже занято!</h3>";
-            return false;
-        }
-    }
-
-    //формируем строку для нового пользователя
-    $line = $name . ":" . md5($pass) . ":" . $email . "\n";
-    //записываем в файл
-    fputs($file, $line);
-    fclose($file);
+    $ins = "insert into users(login, password, email) values('$name', '$hash_password', '$email')";
+    $link = connect();
+    $link->query($ins);
+    $link->close();
     return true;
 }
 
@@ -64,33 +62,20 @@ function LogInAccount()
             $login =  $_POST["login"];
             $password = $_POST["password"];
 
-            global $users;
-            $file = fopen($users, "r");
-            while ($line = fgets($file, 128)) {
-                // echo "line->   $line";
-                $readname = substr($line, 0, strpos($line, ":"));
-                // echo "<br>readname->   $readname <br>";
-                if ($readname == $login) {
-                    $left = substr($line, strlen($readname) + 1);
-                    // echo "left->   $left <br>";
-                    $password = md5($password);
-                    $right = substr($left, 0, strpos($left, ":"));
-                    // echo "right->   $right<br>";
-                    if ($right == $password) {
-                        echo "<div class='text-success'>Авторизация успешна</div>";
-                        $_SESSION["registered-user"] = $login;
-                        header('Location: ' . $_SERVER['REQUEST_URI']);
-                        return true;
-                    } else {
-                        echo "<div class='text-danger'>Неверный пароль</div>";
-                        unset($_SESSION["registered-user"]);
-                        return false;
-                    }
-                }
+            $got_hash_password = md5($password);
+
+            $link = connect();
+            $sel = "select * from users where login='$login' and password='$got_hash_password'";
+
+            $res = $link->query($sel);
+            if ($row = $res->fetch_assoc()) {
+                $_SESSION["registered-user"] = $login;
+                header("Refresh:0");
+                return true;
+            } else {
+                echo "<h3><span style='color: red;'>Логин или пароль ввведены неверно!</span></h3>";
+                return false;
             }
-            echo "<div class='text-danger'>Аккаунт с указанным логином не найден!</div>";
-            unset($_SESSION["registered-user"]);
-            return false;
         }
     }
 }
