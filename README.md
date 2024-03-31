@@ -1,8 +1,8 @@
 Проекты с домашней и другими работами когда я изучал php.
 
 # Content
-- [Проекты](projects)
-- [Технологии](technologies)
+- [Проекты](#Projects)
+- [Технологии](#Technologies)
 
 # Projects
 1. ***-UNRELEASED-** Session storage* - использование сессий для сохранения данных
